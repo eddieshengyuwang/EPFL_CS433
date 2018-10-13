@@ -1,5 +1,6 @@
 import numpy as np
 from proj1_helpers import load_csv_data, predict_labels, create_csv_submission
+<<<<<<< HEAD
 from created_helpers import batch_iter, least_squares_cost
 
 
@@ -38,6 +39,16 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
 def least_squares(y, tx):
 
 
+=======
+
+def least_squares_GD(y, tx, initial_w, max_iters, gamma):
+    pass
+
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
+    pass
+
+def least_squares(y, tx):
+>>>>>>> c148e344de3fa9ef24c892699a4f061eab4af950
     pass
 
 def ridge_regression(y, tx, lambda_):
@@ -47,4 +58,9 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     pass
 
 def reg_logistic_regression(y, tx, lambda_, inital_w, max_iters, gamma):
+<<<<<<< HEAD
     pass
+=======
+    pass
+
+>>>>>>> c148e344de3fa9ef24c892699a4f061eab4af950
