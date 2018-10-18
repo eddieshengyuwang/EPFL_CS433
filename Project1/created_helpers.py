@@ -9,7 +9,25 @@ def least_squares_cost(y, tx, w):
     '''
     cost = (1/2) * np.sum(np.square(y-np.dot(tx, w)))
     return cost
-
+ 
+def sigmoid_fn(z):
+    h = 1 / (1 + np.exp(-z))
+    return h
+    
+def logistic_regression_cost(y, tx, w):
+    z = np.dot(tx, w)
+    h = sigmoid_fn(z)
+    cost  = (-y) * np.log(h) - (1 - y) * np.log(1 - h)
+    return cost
+   
+    
+def reg_logistic_regression_cost(y, tx, w, lambda_):
+    cost_1 = logistic_regression_cost(y, tx, w)
+    cost_2 = (lambda_ / 2 * len(tx)) * \
+              np.sum(np.power(w[:,1:w.shape[1]], 2))
+    cost = cost_1 + cost_2
+    return cost
+    
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True): # taken from ex02 helper.py
     """
     Generate a minibatch iterator for a dataset.
