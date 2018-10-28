@@ -4,9 +4,7 @@ and n to represent # columns
 '''
 
 import numpy as np
-from created_helpers import batch_iter, least_squares_cost, sigmoid_fn, \
-                            logistic_regression_cost, \
-                            reg_logistic_regression_cost
+from created_helpers import *
 
 def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     '''
@@ -24,7 +22,7 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
         gradient = np.dot(tx.T, error)  # (n,m)x(m,1) -> (n,1)
         initial_w = initial_w - (gamma / m) * gradient
 
-    cost = least_squares_cost(y, tx, initial_w)
+    cost = least_squares_cost(y, tx, initial_w) # imported from created_helpers
     return (initial_w, cost)
 
 
@@ -37,33 +35,30 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
             gradient = np.dot(minibatch_tx.T, error)  # (n,1)x(1,1) -> (n,1)
             initial_w = initial_w - (gamma / m) * gradient
 
-    cost = least_squares_cost(y, tx, initial_w)
+    cost = least_squares_cost(y, tx, initial_w) # imported from created_helpers
 
     return (initial_w, cost)
 
 def least_squares(y, tx):
     # equation is (X.T*X)^(-1) * (X.T*y)
-    # question for TA's, should we use np.linalg.solve instead of invert?
+    first_term = tx.T.dot(tx)
+    second_term = tx.T.dot(y)
+    optimal_weight = np.linalg.solve(first_term, second_term)
+    cost = least_squares_cost(y, tx, optimal_weight) # imported from created_helpers
+    return (optimal_weight, cost) # (n,n)x(n,1) -> (n,1)
+
     
-    first_term = np.linalg.inv(np.dot(tx.T,tx)) # inv((n,m)x(m,n)) -> (n,n)
-    second_term = np.dot(tx.T,y) # (n,m)x(m,1) -> (n,1)
-    return np.dot(first_term, second_term) # (n,n)x(n,1) -> (n,1)
-
-def ridge_regression(y, tx, lambda_):
-    # equation is (X.T*X + (lambda')*I)^(-1) * (X.T*y)
-    # where lambda' = 2*m*lambda_
-    # question for TA's, should we use np.linalg.solve instead of invert?
-
-    m = tx.shape[0]
-    lambda_prime = 2*m*lambda_ # int
-
-    xT_x = np.dot(tx.T, tx) # (n,m)x(m,n) -> (n,n)
-    lambda_I = np.dot(lambda_prime, np.eye(n)) # int * (n,n) -> (n,n)
-    xT_y = np.dot(tx.T, y) # (n,m)x(m,1) -> (n,1)
-
-    return np.dot(np.linalg.inv(xT_x + lambda_I),xT_y) # (n,n)x(n,1) -> (n,1)
-
-
+def ridge_regression(y, tx, lamb):
+    """implement ridge regression."""
+    print("what")
+    aI = lamb * np.identity(tx.shape[1])
+    a = tx.T.dot(tx) + aI
+    b = tx.T.dot(y)
+    optimal_weight = np.linalg.solve(a, b)
+    print("bye")
+    cost = ridge_regression_cost(y, tx, optimal_weight, lamb) # imported from created_helpers
+    print("hi")
+    return (optimal_weight, cost)
         
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     m = y.shape[0]
@@ -74,7 +69,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         gradient = np.dot(tx.T, error)
         initial_w = initial_w - learning_rate * gradient
 
-    cost = logistic_regression_cost(y, tx, initial_w)
+    cost = logistic_regression_cost(y, tx, initial_w) # imported from created_helpers
 
     return (initial_w, cost)
     
@@ -91,6 +86,6 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
             gradient = np.dot(tx.T, error) + (lambda_ / m) * initial_w
         initial_w = initial_w - learning_rate * gradient
 
-    cost = logistic_regression_cost(y, tx, initial_w)
+    cost = logistic_regression_cost(y, tx, initial_w) # imported from created_helpers
 
     return (initial_w, cost)

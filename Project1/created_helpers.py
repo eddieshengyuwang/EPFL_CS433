@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def least_squares_cost(y, tx, w):
     '''
@@ -7,27 +8,75 @@ def least_squares_cost(y, tx, w):
     :param w: np.array (n,1)
     :return: float
     '''
-    cost = (1/2) * np.sum(np.square(y-np.dot(tx, w)))
+    m = tx.shape[0]
+    cost = np.sum(np.square(y-np.dot(tx, w))) / (2*m)
     return cost
  
 def sigmoid_fn(z):
     h = 1 / (1 + np.exp(-z))
     return h
+
+def ridge_regression_cost(y, tx, w, lambda_):
+    # assume w has no bias column
     
+    m = tx.shape[0]
+    a = np.sum(np.square(y-np.dot(tx, w)))
+    b = lambda_ * np.sum(np.square(w))
+    cost =  (a+b) / (2*m)
+    return cost
+    
+# compute cost
 def logistic_regression_cost(y, tx, w):
-    z = np.dot(tx, w)
+    z = tx.dot(w)
     h = sigmoid_fn(z)
-    cost  = (-y) * np.log(h) - (1 - y) * np.log(1 - h)
-    return cost
-   
+    cost  = y.T.dot(np.log(h)) + (1 - y).T.dot(np.log(1 - h))
+    return np.squeeze(- cost)
+
+# gradient of loss
+def logistic_regression_gradient(y, tx, w):
+    z = tx.dot(w)
+    h = sigmoid_fn(z)
+    grad = tx.T.dot(h - y)
+    return grad
     
-def reg_logistic_regression_cost(y, tx, w, lambda_):
-    cost_1 = logistic_regression_cost(y, tx, w)
-    cost_2 = (lambda_ / 2 * len(tx)) * \
-              np.sum(np.power(w[:,1:w.shape[1]], 2))
-    cost = cost_1 + cost_2
-    return cost
+def reg_logistic_regression_cost_grad(y, tx, w, lambda_):
+    loss = logistic_regression_cost(y, tx, w) + lambda_ * np.squeeze(w.T.dot(w))
+    gradient = logistic_regression_gradient(y, tx, w) + 2 * lambda_ * w
+    return loss, gradient
+
+def build_k_indices(y, k_fold, seed):
+    """build k indices for k-fold."""
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = [indices[k * interval: (k + 1) * interval] for k in range(k_fold)]
+    return np.array(k_indices)
+  
+def compute_mse(y, tx, w):
+    """compute the loss by mse."""
+    e = y - tx.dot(w)
+    mse = e.dot(e) / (2 * len(e))
+    return mse
+  
+def cross_validation_visualization(lambds, mse_tr, mse_te):
+    """visualization the curves of mse_tr and mse_te."""
+    plt.semilogx(lambds, mse_tr, marker=".", color='b', label='train error')
+    plt.semilogx(lambds, mse_te, marker=".", color='r', label='test error')
+    plt.xlabel("lambda")
+    plt.ylabel("rmse")
+    plt.title("cross validation")
+    plt.legend(loc=2)
+    plt.grid(True)
+    plt.savefig("cross_validation")
     
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree."""
+    poly = np.ones((len(x), 1))
+    for deg in range(1, degree+1):
+        poly = np.c_[poly, np.power(x, deg)]
+    return poly
+
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True): # taken from ex02 helper.py
     """
     Generate a minibatch iterator for a dataset.
