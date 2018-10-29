@@ -47,18 +47,12 @@ def least_squares(y, tx):
     cost = least_squares_cost(y, tx, optimal_weight) # imported from created_helpers
     return (optimal_weight, cost) # (n,n)x(n,1) -> (n,1)
 
-    
-def ridge_regression(y, tx, lamb):
+def ridge_regression(y, tx, lambda_):
     """implement ridge regression."""
-    print("what")
-    aI = lamb * np.identity(tx.shape[1])
+    aI = 2 * tx.shape[0] * lambda_ * np.identity(tx.shape[1])
     a = tx.T.dot(tx) + aI
     b = tx.T.dot(y)
-    optimal_weight = np.linalg.solve(a, b)
-    print("bye")
-    cost = ridge_regression_cost(y, tx, optimal_weight, lamb) # imported from created_helpers
-    print("hi")
-    return (optimal_weight, cost)
+    return np.linalg.solve(a, b)
         
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
     m = y.shape[0]
